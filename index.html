@@ -1,3 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceLab AI | Premium Speech Synthesis</title>
+    <style>
+        :root {
+            --bg-main: #09090b;
+            --bg-card: rgba(20, 20, 25, 0.7);
+            --border-glow: rgba(37, 99, 235, 0.2);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --accent-hover: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(29, 78, 216, 0.05) 0%, transparent 40%);
+        }
+        .container { width: 100%; max-width: 680px; padding: 40px 24px; box-sizing: border-box; }
+        .header { text-align: center; margin-bottom: 32px; }
+        .header h1 {
+            font-size: 2.5rem; font-weight: 700; letter-spacing: -0.05em; margin: 0 0 8px 0;
+            background: linear-gradient(to right, #ffffff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header p { color: var(--text-secondary); font-size: 1rem; margin: 0; }
+        .app-card {
+            background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: border-color 0.3s ease;
+        }
+        .app-card:focus-within { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--border-glow); }
+        .field-label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .config-box { margin-bottom: 20px; }
+        input[type="password"] {
+            width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; color: var(--text-primary); padding: 12px; font-size: 0.9rem; box-sizing: border-box; outline: none;
+        }
+        input[type="password"]:focus { border-color: #3b82f6; }
+
+        textarea {
+            width: 100%; min-height: 140px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px; color: var(--text-primary); padding: 16px; font-size: 1rem; line-height: 1.5; resize: vertical; box-sizing: border-box; outline: none; transition: all 0.2s ease;
+        }
+        textarea:focus { border-color: #3b82f6; background: rgba(0, 0, 0, 0.4); }
+        .char-counter { text-align: right; font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; }
+        .action-row { margin-top: 24px; }
+        button {
+            background: var(--accent-gradient); color: white; width: 100%; padding: 14px; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        button:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3); }
+        button:disabled { background: #27272a; color: #71717a; cursor: not-allowed; box-shadow: none; }
+        .status-container { margin-top: 24px; display: none; text-align: center; }
+        .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status-text { font-size: 0.9rem; color: var(--text-secondary); }
+        .result-container { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: none; text-align: center; }
+        audio { width: 100%; border-radius: 8px; outline: none; background: #18181b; margin-bottom: 12px; }
+        audio::-webkit-media-controls-enclosure { background-color: #18181b; }
+        .download-btn { background: #27272a; color: #f4f4f5; margin-top: 8px; font-size: 0.9rem; padding: 10px; border: none; width: 100%; border-radius: 8px; cursor: pointer; }
+        .download-btn:hover { background: #3f3f46; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VoiceLab AI</h1>
+            <p>Generative Speech Engine Powered by Free Edge Clusters</p>
+        </div>
+        <div class="app-card">
+            <div class="config-box">
+                <span class="field-label">Hugging Face Access Token</span>
+                <input type="password" id="tokenInput" placeholder="Paste your hf_ token here to unlock free cloud rendering...">
+            </div>
+
+            <span class="field-label">Text Prompt</span>
+            <textarea id="textInput" maxlength="500" placeholder="Type or paste your script here to generate ultra-realistic speech synthesis instantly..." oninput="updateCount()"></textarea>
+            <div class="char-counter"><span id="charCount">0</span>/500</div>
+            
+            <div class="action-row">
+                <button id="submitBtn" onclick="generateSpeech()">Generate Audio</button>
+            </div>
+            
+            <div id="statusContainer" class="status-container">
+                <div class="spinner"></div>
+                <div id="statusText" class="status-text">Transmitting tokens to Bark AI cluster nodes...</div>
+            </div>
+            
+            <div id="resultContainer" class="result-container">
+                <span class="field-label" style="margin-bottom: 12px; text-align: left;">Generated Output</span>
+                <audio id="audioPlayback" controls></audio>
+                <button id="downloadBtn" class="download-btn" onclick="downloadAudio()">Download Audio File</button>
+            </div>
+        </div>
+    </div>
     <script>
         document.getElementById('tokenInput').value = localStorage.getItem('hf_token') || '';
 
@@ -28,7 +135,6 @@
             statusText.innerText = "Transmitting tokens to Bark AI cluster nodes...";
 
             try {
-                // Connecting to the premium browser-compatible Bark model matrix
                 const response = await fetch("https://huggingface.co", {
                     method: "POST",
                     headers: {
@@ -75,3 +181,5 @@
             document.body.removeChild(a);
         }
     </script>
+</body>
+</html>
