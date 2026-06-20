@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "/api/synthesize",
+      "dest": "/api/synthesize.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
