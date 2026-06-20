@@ -168,13 +168,15 @@
         }
 
         function downloadAudio() {
-            if (!audioUrl) return;
-            const a = document.createElement('a');
-            a.href = audioUrl;
-            a.download = `voicelab-ai-${Date.now()}.flac`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+    if (!audioUrl) return;
+    const a = document.createElement('a');
+    a.href = audioUrl;
+    a.download = `voicelab-ai-${Date.now()}.wav`; // Changed to .wav
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
         }
     </script>
 </body>
