@@ -109,8 +109,7 @@
         document.getElementById('tokenInput').value = localStorage.getItem('hf_token') || '';
 
         function updateCount() {
-            const len = document.getElementById('textInput').value.length;
-            document.getElementById('charCount').innerText = len;
+            document.getElementById('charCount').innerText = document.getElementById('textInput').value.length;
         }
 
         let audioUrl = null;
@@ -132,21 +131,13 @@
             btn.disabled = true;
             resultContainer.style.display = 'none';
             statusContainer.style.display = 'block';
-            statusText.innerText = "Transmitting tokens to Bark AI cluster nodes...";
 
             try {
-                // FIXED: Routing through the open-source cors-anywhere proxy network bypass wrapper
-                const proxyUrl = "https://herokuapp.com";
-                const targetUrl = "https://huggingface.co";
-
-                const response = await fetch(proxyUrl + targetUrl, {
+                // Connect natively to your secure Vercel environment path route
+                const response = await fetch('/api/synthesize', {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    body: JSON.stringify({ inputs: text })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text, token: token })
                 });
 
                 if (!response.ok) {
@@ -169,7 +160,22 @@
                 player.play();
             } catch (err) {
                 statusContainer.style.display = 'none';
-                // Provide actionable fix text if the user needs to unlock the demo proxy session
-                if(err.message.includes("403") || err.message.includes("status")) {
-                     alert("CORS Proxy Activation Needed!\n\nPlease open this link in a new tab to activate your temporary free demo session, click 'Opt-in', then refresh this page:\n\nhttps://herokuapp.comcorsdemo");
-                } else {
+                alert("AI Pipeline Error: " + err.message);
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function downloadAudio() {
+            if (!audioUrl) return;
+            const a = document.createElement('a');
+            a.href = audioUrl;
+            a.download = `voicelab-ai-${Date.now()}.flac`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
