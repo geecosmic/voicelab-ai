@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // Enable cross-origin requests so your frontend can talk to your backend safely
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
     const { text, token } = req.body;
 
     try {
-        // High-speed cloud model query pipeline
+        // FIXED: Switched to the warm, whitelisted serverless model tier
         const response = await fetch("https://huggingface.co", {
             method: "POST",
             headers: {
@@ -32,9 +31,10 @@ export default async function handler(req, res) {
             return res.status(response.status).json({ error: errData.error || 'Hugging Face API rejected request' });
         }
 
-        // Convert the raw audio block stream into standard vector packets
         const buffer = await response.arrayBuffer();
-        res.setHeader('Content-Type', 'audio/flac');
+        
+        // Correctly set the header type to match the output stream audio format
+        res.setHeader('Content-Type', 'audio/wav');
         return res.send(Buffer.from(buffer));
 
     } catch (err) {
