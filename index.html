@@ -95,7 +95,7 @@
             
             <div id="statusContainer" class="status-container">
                 <div class="spinner"></div>
-                <div id="statusText" class="status-text">Transmitting tokens to Bark AI cluster nodes...</div>
+                <div id="statusText" class="status-text">Processing stream data loops...</div>
             </div>
             
             <div id="resultContainer" class="result-container">
@@ -131,9 +131,9 @@
             btn.disabled = true;
             resultContainer.style.display = 'none';
             statusContainer.style.display = 'block';
+            statusText.innerText = "Transmitting sequence payloads to secure cluster...";
 
             try {
-                // Connect natively to your secure Vercel environment path route
                 const response = await fetch('/api/synthesize', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -142,12 +142,7 @@
 
                 if (!response.ok) {
                     const errData = await response.json().catch(() => ({}));
-                    if (errData.error && errData.error.includes("loading")) {
-                        statusText.innerText = "Waking up cloud server clusters... please wait 20 seconds.";
-                        setTimeout(generateSpeech, 20000);
-                        return;
-                    }
-                    throw new Error(errData.error || `Server error code: ${response.status}`);
+                    throw new Error(errData.error || `Server responded with status code ${response.status}`);
                 }
 
                 const blob = await response.blob();
@@ -160,7 +155,7 @@
                 player.play();
             } catch (err) {
                 statusContainer.style.display = 'none';
-                alert("AI Pipeline Error: " + err.message);
+                alert("AI Pipeline Network Status: " + err.message);
                 console.error(err);
             } finally {
                 btn.disabled = false;
@@ -168,15 +163,13 @@
         }
 
         function downloadAudio() {
-    if (!audioUrl) return;
-    const a = document.createElement('a');
-    a.href = audioUrl;
-    a.download = `voicelab-ai-${Date.now()}.wav`; // Changed to .wav
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
+            if (!audioUrl) return;
+            const a = document.createElement('a');
+            a.href = audioUrl;
+            a.download = `voicelab-ai-${Date.now()}.wav`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
